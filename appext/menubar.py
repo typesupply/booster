@@ -207,10 +207,14 @@ if app is not None:
 
 if __name__ == "__main__":
     import vanilla
+    from vanilla.test.testTools import executeVanillaTest
 
     class Test(object):
 
         def __init__(self):
+            app = NSApp()
+            self.m = _MenuManager(app.mainMenu())
+
             self.w = vanilla.Window((500, 500))
             self.w.startButton = vanilla.Button((10, 10, -10, 20), "Start", callback=self.startButtonCallback)
             self.w.stopButton = vanilla.Button((10, 40, -10, 20), "Stop", callback=self.stopButtonCallback)
@@ -238,12 +242,12 @@ if __name__ == "__main__":
                     ]
                 )
             ]
-            buildMenu("MenuTest", "Hey Erik", items)
+            self.m.buildMenu("MenuTest", "Hey Erik", items)
 
         def stopButtonCallback(self, sender):
-            teardownMenu("MenuTest")
+            self.m.teardownMenu("MenuTest")
 
         def reportButtonCallback(self, sender):
-            setItemData("MenuTest.thisMenu", title="Fooooooo")
+            self.m.setItemData("MenuTest.thisMenu", title="Fooooooo")
 
-    Test()
+    executeVanillaTest(Test)

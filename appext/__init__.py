@@ -1,27 +1,35 @@
 from appext import menubar
 from appext import defaults
 
+"""
+This needs to handle wrapping/unwrapping fonts with FontParts subclasses.
+We won't be able to make defcon subclasses anymore, so we'll have to get
+by with FontParts.
+"""
+
 class ExtensionManager(object):
 
-    def __init__(self, owner):
-        self.owner = owner
-        self.ownerStub = owner + "."
+    def __init__(self, owner, userDefaults={}, menu=None):
+        # self.owner = owner
+        # self.ownerStub = owner + "."
+        # # defaults
+        # userDefaults = {}
+        # for key, value in userDefaults.items():
+        #     userDefaults[self.ownerStub + key] = value
+        # defaults.registerDefaults(userDefaults)
+        # # menu
+        # if self._menu is not None:
+        #     menubar.buildMenu(self.owner, title, items)
 
-    def __del__(self):
+    def terminate(self):
         """
-        - menu tear down
-        - notification observer release
+        - opposite of initiate
         """
+        menubar.teardownMenu(self.owner)
 
     # --------
     # Defaults
     # --------
-
-    def registerDefaults(self, data):
-        completed = {}
-        for key, value in data.items():
-            completed[self.ownerStub + key] = value
-        defaults.registerDefaults(completed)
 
     def getDefault(self, key, fallback=None):
         key = self.ownerStub + key
@@ -45,12 +53,6 @@ class ExtensionManager(object):
     # Menubar
     # -------
 
-    def buildMenu(self, title, items):
-        menubar.buildMenu(self.owner, title, items)
-
-    def teardownMenu(self, title=None):
-        menubar.teardownMenu(self.owner, title=title)
-
     def getItemData(self, identifier):
         return menubar.getItemData(identifier)
 
@@ -60,6 +62,9 @@ class ExtensionManager(object):
     # -------
     # Objects
     # -------
+
+    def wrapFont(self, font):
+        pass
 
     def getAllFonts(self):
         pass
@@ -76,3 +81,8 @@ class ExtensionManager(object):
     def setCurrentGlyph(self, glyph):
         pass
 
+
+
+class Test(object):
+
+    def __init__(self):
