@@ -56,14 +56,20 @@ class ExtensionManager(object):
     # Objects
     # -------
 
-    def wrapFont(self, font):
-        pass
+    def _rewrapFont(self, native):
+        naked = native.naked()
+        wrapped = self.wrapFont(naked)
+        return wrapped
 
     def getAllFonts(self):
-        pass
+        return [self._rewrapFont(native) for native in AllFonts()]
 
     def openFont(self, path, showInterface=True):
-        pass
+        native = OpenFont(path, showInterface=showInterface)
+        return self._rewrapFont(native)
 
     def getCurrentFont(self):
-        pass
+        native = CurrentFont()
+        if native is None:
+            return None
+        return self._rewrapFont(native)

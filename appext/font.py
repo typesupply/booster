@@ -7,11 +7,11 @@ Subclass Font and any necessary classes, setting the
 """
 
 __all__ = [
-    # "AllFonts",
-    # "CurrentFont",
-    # "CurrentGlyph",
-    # "NewFont",
-    # "OpenFont",
+    "AllFonts",
+    "CurrentFont",
+    "CurrentGlyph",
+    "NewFont",
+    "OpenFont",
     "AppExtFont",
     "AppExtInfo",
     "AppExtGroups",
@@ -45,6 +45,12 @@ if environment.inRoboFont:
     baseAnchor = roboFont.RAnchor
     baseGuideline = roboFont.RGuideline
     baseImage = roboFont.RImage
+    from mojo import roboFont
+    AllFonts = roboFont.AllFonts
+    CurrentFont = roboFont.CurrentFont
+    CurrentGlyph = roboFont.CurrentGlyph
+    NewFont = roboFont.NewFont
+    OpenFont = roboFont.OpenFont
 else:
     from fontParts import nonelab
     baseFont = nonelab.RFont
@@ -60,6 +66,12 @@ else:
     baseAnchor = nonelab.RAnchor
     baseGuideline = nonelab.RGuideline
     baseImage = nonelab.RImage
+    from fontParts import world
+    AllFonts = world.AllFonts
+    CurrentFont = world.CurrentFont
+    CurrentGlyph = world.CurrentGlyph
+    NewFont = world.NewFont
+    OpenFont = world.OpenFont
 
 
 class AppExtBase(object):
