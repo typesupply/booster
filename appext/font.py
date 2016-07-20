@@ -98,6 +98,34 @@ class AppExtBase(object):
     def destroyAllRepresentations(self):
         self.naked().destroyAllRepresentations()
 
+    # -------------
+    # Notifications
+    # -------------
+
+    def addObserver(self, observer, methodName, notification):
+        self.naked().addObserver(observer, methodName, notification)
+
+    def removeObserver(self, observer, notification):
+        self.naked().removeObserver(observer, notification)
+
+    def hasObserver(self, observer, notification):
+        return self.naked().hasObserver(observer, notification)
+
+    def holdNotifications(self, notification=None):
+        self.naked().holdNotifications(self, notification=notification)
+
+    def releaseHeldNotifications(self, notification=None):
+        self.naked().releaseHeldNotifications(self, notification=notification)
+
+    def disableNotifications(self, notification=None, observer=None):
+        self.naked().disableNotifications(notification=notification, observer=observer)
+
+    def enableNotifications(self, notification=None, observer=None):
+        self.naked().enableNotifications(notification=notification, observer=observer)
+
+    def postNotification(self, notification, data=None):
+        self.naked().postNotification(notification, data=data)
+
 
 class AppExtLib(AppExtBase, baseLib):
 
