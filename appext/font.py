@@ -76,7 +76,27 @@ else:
 
 class AppExtBase(object):
 
-    pass
+    # ---------------
+    # Representations
+    # ---------------
+
+    def registerRepresentationFactory(self, name, factory, destructiveNotifications=None):
+        naked = self.naked()
+        if destructiveNotifications is None:
+            destructiveNotifications = [naked.changeNotificationName]
+        naked.representationFactories[name] = dict(
+            factory=factory,
+            destructiveNotifications=destructiveNotifications
+        )
+
+    def getRepresentation(self, name, **kwargs):
+        return self.naked().getRepresentation(name, **kwargs)
+
+    def destroyRepresentation(self, name, **kwargs):
+        self.naked().destroyRepresentation(name, **kwargs)
+
+    def destroyAllRepresentations(self):
+        self.naked().destroyAllRepresentations()
 
 
 class AppExtLib(AppExtBase, baseLib):
