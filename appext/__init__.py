@@ -7,30 +7,30 @@ from appext.font import *
 class ExtensionManager(object):
 
     def __init__(self, owner, userDefaults=None, menu=None, fontWrapper=None):
-        self._menubar = SharedMenubar()
-        self._userDefaults = SharedUserDefaults()
+        self.menubar = SharedMenubar()
+        self.userDefaults = SharedUserDefaults()
         self.owner = owner
         if userDefaults is not None:
-            self._userDefaults.registerDefaults(owner, userDefaults)
+            self.userDefaults.registerDefaults(owner, userDefaults)
         if menu is not None:
             title = menu["title"]
             items = menu["items"]
-            self._menubar.buildMenu(owner, title, items)
+            self.menubar.buildMenu(owner, title, items)
         if fontWrapper is None:
-            self._fontWrapper = AppExtFont
+            self.fontWrapper = AppExtFont
 
     def teardown(self):
-        self._menubar.teardownMenu(self.owner)
+        self.menubar.teardownMenu(self.owner)
 
     # --------
     # Defaults
     # --------
 
     def getUserDefault(self, key, fallback=None):
-        self._userDefaults.getDefault(self.owner, key, fallback=fallback)
+        self.userDefaults.getDefault(self.owner, key, fallback=fallback)
 
     def setUserDefault(self, key, value):
-        self._userDefaults.setDefault(self.owner, key, value)
+        self.userDefaults.setDefault(self.owner, key, value)
 
     # -------------
     # Notifications
@@ -47,10 +47,10 @@ class ExtensionManager(object):
     # -------
 
     def getMenuItemData(self, identifier):
-        return self._menubar.getItemData(identifier)
+        return self.menubar.getItemData(identifier)
 
     def setMenuItemData(self, identifier, **kwargs):
-        self._menubar.setItemData(identifier, kwargs)
+        self.menubar.setItemData(identifier, kwargs)
 
     # -------
     # Objects
@@ -58,7 +58,7 @@ class ExtensionManager(object):
 
     def _rewrapFont(self, native):
         naked = native.naked()
-        wrapped = self.wrapFont(naked)
+        wrapped = self.fontWrapper(naked)
         return wrapped
 
     def getAllFonts(self):
