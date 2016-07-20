@@ -1,19 +1,14 @@
 from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
 from appext import environment
+from appext.font import *
 
-"""
-This needs to handle wrapping/unwrapping fonts with FontParts subclasses.
-We won't be able to make defcon subclasses anymore, so we'll have to get
-by with FontParts.
-"""
 
 class ExtensionManager(object):
 
-    def __init__(self, owner, userDefaults=None, menu=None):
+    def __init__(self, owner, userDefaults=None, menu=None, fontWrapper=None):
         self._menubar = SharedMenubar()
         self._userDefaults = SharedUserDefaults()
-
         self.owner = owner
         if userDefaults is not None:
             self._userDefaults.registerDefaults(owner, userDefaults)
@@ -21,6 +16,8 @@ class ExtensionManager(object):
             title = menu["title"]
             items = menu["items"]
             self._menubar.buildMenu(owner, title, items)
+        if fontWrapper is None:
+            self._fontWrapper = AppExtFont
 
     def teardown(self):
         self._menubar.teardownMenu(self.owner)

@@ -8,15 +8,15 @@ SharedUserDefaults.setDefault("foo", NSColor.redColor())
 
 from Foundation import *
 from AppKit import *
-from appext.environment import inRoboFont
-if inRoboFont:
+from appext import environment
+if environment.inRoboFont:
     from mojo import extensions as mojoExtensions
 
 
 class _DefaultsManager(object):
 
     def __init__(self):
-        if not inRoboFont:
+        if not environment.inRoboFont:
             self._defaults = {}
 
     def registerDefaults(self, owner, data):
@@ -28,7 +28,7 @@ class _DefaultsManager(object):
                 d[k] = v
             data = d
         data = _normalizeIncomingData(data)
-        if inRoboFont:
+        if environment.inRoboFont:
             mojoExtensions.registerExtensionDefaults(data)
         else:
             self._defaults.update(data)
@@ -37,7 +37,7 @@ class _DefaultsManager(object):
         if owner is not None:
             owner = _makeOwnerStub(owner)
             key = _makeOwnerKey(owner, key)
-        if inRoboFont:
+        if environment.inRoboFont:
             value = mojoExtensions.getExtensionDefault(key, fallback=fallback)
         else:
             if key in self._defaults:
@@ -52,7 +52,7 @@ class _DefaultsManager(object):
             owner = _makeOwnerStub(owner)
             key = _makeOwnerKey(owner, key)
         value = _normalizeIncomingData(value)
-        if inRoboFont:
+        if environment.inRoboFont:
             mojoExtensions.setExtensionDefault(key, value)
         else:
             self._defaults[key] = value
