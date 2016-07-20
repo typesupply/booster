@@ -1,57 +1,76 @@
 """
-User defaults abstraction.
+The application's shared user defaults.
 
-The available functions are:
-
-registerDefaults({"something" : "foo"})
-value = getDefault("something")
-setDefault("foo", NSColor.redColor())
+SharedUserDefaults.registerDefaults({"something" : "foo"})
+value = SharedUserDefaults.getDefault("something")
+SharedUserDefaults.setDefault("foo", NSColor.redColor())
 """
 
-from Foundation import NSData, NSMutableDictionary, NSDictionary, NSArchiver, NSUnarchiver
-from AppKit import NSColor
-from appext.bundle import inRoboFont
-
-__all__ = [
-    "registerDefaults",
-    "getDefault",
-    "setDefault"
-]
-
+from Foundation import *
+from AppKit import *
+from appext.environment import inRoboFont
 if inRoboFont:
     from mojo import extensions as mojoExtensions
-else:
-    _defaults = {}
 
 
-def registerDefaults(data):
-    data = _normalizeIncomingData(data)
-    if inRoboFont:
-        mojoExtensions.registerExtensionDefaults(data)
-    else:
-        _defaults.update(data)
+class _DefaultsManager(object):
 
-def getDefault(key, fallback=None):
-    if inRoboFont:
-        value = mojoExtensions.getExtensionDefault(key, fallback=fallback)
-    else:
-        if key in _defaults:
-            value = _defaults[key]
+    def __init__(self):
+        if not inRoboFont:
+            self._defaults = {}
+
+    def registerDefaults(self, owner, data):
+        if owner is not None:
+            owner = _makeOwnerStub(owner)
+            d = {}
+            for k, v in data.items():
+                k = _makeOwnerKey(owner, k)
+                d[k] = v
+            data = d
+        data = _normalizeIncomingData(data)
+        if inRoboFont:
+            mojoExtensions.registerExtensionDefaults(data)
         else:
-            value = fallback
-    value = _normalizeOutgoingData(value)
-    return value
+            self._defaults.update(data)
 
-def setDefault(key, value):
-    value = _normalizeIncomingData(value)
-    if inRoboFont:
-        mojoExtensions.setExtensionDefault(key, value)
-    else:
-        _defaults[key] = value
+    def getDefault(self, owner, key, fallback=None):
+        if owner is not None:
+            owner = _makeOwnerStub(owner)
+            key = _makeOwnerKey(owner, key)
+        if inRoboFont:
+            value = mojoExtensions.getExtensionDefault(key, fallback=fallback)
+        else:
+            if key in self._defaults:
+                value = self._defaults[key]
+            else:
+                value = fallback
+        value = _normalizeOutgoingData(value)
+        return value
 
-# --------------
-# Internal Tools
-# --------------
+    def setDefault(self, owner, key, value):
+        if owner is not None:
+            owner = _makeOwnerStub(owner)
+            key = _makeOwnerKey(owner, key)
+        value = _normalizeIncomingData(value)
+        if inRoboFont:
+            mojoExtensions.setExtensionDefault(key, value)
+        else:
+            self._defaults[key] = value
+
+
+def _makeOwnerStub(owner):
+    if not owner.endswith("."):
+        owner += "."
+    return owner
+
+def _makeOwnerKey(owner, key):
+    if not key.startswith(owner):
+        key = owner + key
+    return key
+
+# ----------------
+# NS Normalization
+# ----------------
 
 def _normalizeIncomingData(data):
     normalized = data
@@ -73,3 +92,15 @@ def _normalizeOutgoingData(data):
         if isinstance(data, NSData):
             normalized = NSUnarchiver.unarchiveObjectWithData_(data)
     return normalized
+
+# -------------
+# Shared Object
+# -------------
+
+_manager = None
+
+def SharedUserDefaults():
+    global _manager
+    if _manager is None:
+        _manager = _DefaultsManager()
+    return _manager

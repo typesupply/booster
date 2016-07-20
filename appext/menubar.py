@@ -1,15 +1,14 @@
 from AppKit import *
 from vanilla.vanillaBase import VanillaCallbackWrapper
 
+
 """
-Main menu abstraction.
+The aplication's shared menubar.
 
-The available functions are:
-
-buildMenu("MyExtension.Go", "Go", items)
-teardownMenu("MyExtension.Go")
-data = getItemData("MyExtension.Go.something")
-setItemData("MyExtension.Go.something", {"state" : "mixed"})
+SharedMenubar.buildMenu("MyExtension.Go", "Go", items)
+SharedMenubar.teardownMenu("MyExtension.Go")
+data = SharedMenubar.getItemData("MyExtension.Go.something")
+SharedMenubar.setItemData("MyExtension.Go.something", {"state" : "mixed"})
 
 Item format:
 
@@ -26,32 +25,6 @@ Item format:
     }
 """
 
-__all__ = [
-    "buildMenu",
-    "teardownMenu",
-    "getItemData",
-    "setItemData"
-]
-
-# ------------
-# External API
-# ------------
-
-def buildMenu(owner, title, items):
-    if _manager is None:
-        return
-    _manager.buildMenu(owner, title, items)
-
-def teardownMenu(owner, title=None):
-    if _manager is None:
-        return
-    _manager.teardownMenu(owner, title=title)
-
-def getItemData(identifier):
-    return _manager.getItemData(identifier)
-
-def setItemData(identifier, **kwargs):
-    _manager.setItemData(identifier, kwargs)
 
 # -------
 # Manager
@@ -84,7 +57,7 @@ _stateMap = {
     "mixed" : -1
 }
 
-class _MenuManager(object):
+class _MenubarManager(object):
 
     def __init__(self, mainMenu):
         self._mainMenu = mainMenu
@@ -193,61 +166,16 @@ class _MenuManager(object):
             item.setState_(state)
 
 
+# -------------
+# Shared Object
+# -------------
+
 _manager = None
-app = NSApp()
-if app is not None:
-    m = app.mainMenu()
-    if m is not None:
-        _manager = _MenuManager(m)
 
-
-# ----
-# Test
-# ----
-
-if __name__ == "__main__":
-    import vanilla
-    from vanilla.test.testTools import executeVanillaTest
-
-    class Test(object):
-
-        def __init__(self):
-            app = NSApp()
-            self.m = _MenuManager(app.mainMenu())
-
-            self.w = vanilla.Window((500, 500))
-            self.w.startButton = vanilla.Button((10, 10, -10, 20), "Start", callback=self.startButtonCallback)
-            self.w.stopButton = vanilla.Button((10, 40, -10, 20), "Stop", callback=self.stopButtonCallback)
-            self.w.reportButton = vanilla.Button((10, 70, -10, 20), "Dump", callback=self.reportButtonCallback)
-            self.w.open()
-
-        def aMenuItemCallback(self, sender):
-            print sender
-
-        def startButtonCallback(self, sender):
-            items = [
-                dict(
-                    title="This Menu",
-                    callback=self.aMenuItemCallback,
-                    identifier="MenuTest.thisMenu",
-                    binding=("e", ["command", "option"])
-                ),
-                dict(title="is built", action="isBuilt_"),
-                dict(separator=True),
-                dict(
-                    title="on the fly!",
-                    submenu=[
-                        dict(title="foo"),
-                        dict(title="bar"),
-                    ]
-                )
-            ]
-            self.m.buildMenu("MenuTest", "Hey Erik", items)
-
-        def stopButtonCallback(self, sender):
-            self.m.teardownMenu("MenuTest")
-
-        def reportButtonCallback(self, sender):
-            self.m.setItemData("MenuTest.thisMenu", title="Fooooooo")
-
-    executeVanillaTest(Test)
+def SharedMenubar():
+    global _manager
+    if _manager is None:
+        app = NSApp()
+        m = app.mainMenu()
+        _manager = _MenubarManager(m)
+    return _manager
