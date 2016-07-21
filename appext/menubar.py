@@ -21,7 +21,7 @@ Item format:
         "target" : NSObject (None)
         "action" : string defining NSObject method name (None)
         "callback" : vanilla style callback
-        "submenu" : [ items ]
+        "items" : [ items ]
     }
 """
 
@@ -93,7 +93,7 @@ class _MenubarManager(object):
                 target = data.get("target")
                 action = data.get("action")
                 callback = data.get("callback")
-                subsubmenu = data.get("submenu")
+                subsubmenu = data.get("items")
                 item = NSMenuItem.alloc().init()
                 item.setTitle_(title)
                 item.setState_(state)
