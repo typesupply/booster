@@ -1,3 +1,9 @@
+"""
+to Do:
+- menu item validation so that items
+  with callbacks aren't always active
+"""
+
 from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
 from appext.notifications import SharedNotificationCenter
