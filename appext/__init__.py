@@ -1,5 +1,6 @@
 from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
+from appext.notifications import SharedNotificationCenter
 from appext import environment
 from appext.font import *
 
@@ -17,7 +18,8 @@ class ExtensionManager(object):
             items = menu["items"]
             self.menubar.buildMenu(owner, title, items)
         if fontWrapper is None:
-            self.fontWrapper = AppExtFont
+            fontWrapper = AppExtFont
+        self.fontWrapper = fontWrapper
 
     def teardown(self):
         self.menubar.teardownMenu(self.owner)
@@ -37,10 +39,29 @@ class ExtensionManager(object):
     # -------------
 
     def addObserver(self, observer=None, selector=None, notification=None, observable=None):
-        pass
+        relay = SharedNotificationCenter()
+        relay.addObserver_selector_notification_observable_(
+            observer,
+            selector, 
+            notification,
+            observable
+        )
 
     def removeObserver(self, observer=None, notification=None, observable=None):
-        pass
+        relay = SharedNotificationCenter()
+        relay.removeObserver_notification_observable_(
+            observer,
+            notification,
+            observable
+        )
+
+    def postNotification(self, notification=None, observable=None, data=None):
+        relay = SharedNotificationCenter()
+        relay.postNotification_observable_userInfo_(
+            notification,
+            observable,
+            data
+        )
 
     # -------
     # Menubar
