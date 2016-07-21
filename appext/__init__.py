@@ -2,6 +2,8 @@
 to Do:
 - menu item validation so that items
   with callbacks aren't always active
+- allow the extension to use an icon in
+  the menu bar instead of a title
 """
 
 from appext.menubar import SharedMenubar
