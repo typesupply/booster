@@ -3,6 +3,7 @@ Cross-language notifications.
 """
 
 from AppKit import *
+from defcon.tools.notifications import NotificationCenter
 
 # -----
 # Relay
@@ -13,6 +14,7 @@ class _NotificationRelay(NSObject):
     def init(self):
         self = super(_NotificationRelay, self).init()
         self._objCCenter = NSNotificationCenter.defaultCenter()
+        self._pythonCenter = NotificationCenter()
         self._pythonObservingObjC = {}
         self._objCObservingPython = {}
         return self
@@ -61,7 +63,12 @@ class _NotificationRelay(NSObject):
         raise NotImplementedError
 
     def addPythonObserver_selector_notification_pythonObservable_(self, observer, selector, notification, observable):
-        raise NotImplementedError
+        self._pythonCenter.addObserver(
+            observer=observer,
+            methodName=selector,
+            notification=notification,
+            observable=observable
+        )
 
     # Remove
 
@@ -112,7 +119,11 @@ class _NotificationRelay(NSObject):
         raise NotImplementedError
 
     def removePythonObserver_notification_pythonObservable_(self, observer, notification, observable):
-        raise NotImplementedError
+        self._pythonCenter.removeObserver(
+            observer=observer,
+            notification=notification,
+            observable=observable
+        )
 
     # Post
 
@@ -131,8 +142,12 @@ class _NotificationRelay(NSObject):
         )
         self._objCCenter.postNotification_(notification)
 
-    def postPythonCNotification_observable_userInfo_(self, notification, observable, userInfo):
-        raise NotImplementedError
+    def postPythonNotification_observable_userInfo_(self, notification, observable, userInfo):
+        self._pythonCenter.postNotification_(
+            notification=notification,
+            observable=observable,
+            data=userInfo
+        )
 
     # Internal Routing
 
@@ -147,7 +162,6 @@ class _NotificationRelay(NSObject):
                 method = getattr(observer, selector)
                 method(notification)
 
-
 # -------------
 # Shared Object
 # -------------
@@ -157,5 +171,5 @@ _relay = None
 def SharedNotificationCenter():
     global _relay
     if _relay is None:
-        _relay = _NotificationRelay()
+        _relay = _NotificationRelay.alloc().init()
     return _relay
