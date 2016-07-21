@@ -6,6 +6,7 @@ to Do:
   the menu bar instead of a title
 """
 
+import weakref
 from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
 from appext.notifications import SharedNotificationCenter
@@ -13,21 +14,11 @@ from appext import environment
 from appext.font import *
 
 
-class ExtensionManager(object):
+class AppExtController(object):
 
-    def __init__(self, owner, userDefaults=None, menu=None, fontWrapper=None):
-        self.menubar = SharedMenubar()
-        self.userDefaults = SharedUserDefaults()
-        self.owner = owner
-        if userDefaults is not None:
-            self.userDefaults.registerDefaults(owner, userDefaults)
-        if menu is not None:
-            title = menu["title"]
-            items = menu["items"]
-            self.menubar.buildMenu(owner, title, items)
-        if fontWrapper is None:
-            fontWrapper = AppExtFont
-        self.fontWrapper = fontWrapper
+    owner = None
+    fontWrapperClass = AppExtFont
+    documentClass = None
 
     def teardown(self):
         self.menubar.teardownMenu(self.owner)
@@ -36,11 +27,37 @@ class ExtensionManager(object):
     # Defaults
     # --------
 
+    def _get_userDefaults(self):
+        return SharedUserDefaults()
+
+    userDefaults = property(_get_userDefaults)
+
+    def registerUserDefaults(self, userDefaults):
+        self.userDefaults.registerDefaults(self.owner, userDefaults)
+
     def getUserDefault(self, key, fallback=None):
         self.userDefaults.getDefault(self.owner, key, fallback=fallback)
 
     def setUserDefault(self, key, value):
         self.userDefaults.setDefault(self.owner, key, value)
+
+    # -------
+    # Menubar
+    # -------
+
+    def _get_menubar(self):
+        return SharedMenubar()
+
+    menubar = property(_get_menubar)
+
+    def buildMenu(self, title, items):
+        self.menubar.buildMenu(self.owner, title, items)
+
+    def getMenuItemData(self, identifier):
+        return self.menubar.getItemData(identifier)
+
+    def setMenuItemData(self, identifier, **kwargs):
+        self.menubar.setItemData(identifier, kwargs)
 
     # -------------
     # Notifications
@@ -72,22 +89,12 @@ class ExtensionManager(object):
         )
 
     # -------
-    # Menubar
-    # -------
-
-    def getMenuItemData(self, identifier):
-        return self.menubar.getItemData(identifier)
-
-    def setMenuItemData(self, identifier, **kwargs):
-        self.menubar.setItemData(identifier, kwargs)
-
-    # -------
     # Objects
     # -------
 
     def _rewrapFont(self, native):
         naked = native.naked()
-        wrapped = self.fontWrapper(naked)
+        wrapped = self.fontWrapperClass(naked)
         return wrapped
 
     def getAllFonts(self):
@@ -102,3 +109,35 @@ class ExtensionManager(object):
         if native is None:
             return None
         return self._rewrapFont(native)
+
+    # ---------
+    # Documents
+    # ---------
+
+    def newDocument(self, *args, **kwargs):
+        kwargs["documentController"] = self
+        document = self.documentClass(*args, **kwargs)
+        return document
+
+
+class AppExtDocument(object):
+
+    def __init__(self, *args, **kwargs):
+        self.documentController = kwargs["documentController"]
+
+    # -------------------
+    # Document Controller
+    # -------------------
+
+    _documentController = None
+
+    def _get_documentController(self):
+        if self._documentController is None:
+            return None
+        return self._documentController()
+
+    def _set_documentController(self, controller):
+        self._documentController = weakref.ref(controller)
+
+    documentController = property(_get_documentController, _set_documentController)
+
