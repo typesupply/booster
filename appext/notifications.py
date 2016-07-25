@@ -3,7 +3,7 @@ Cross-language notifications.
 """
 
 from AppKit import *
-from defcon.tools.notifications import NotificationCenter
+from defcon.tools.notifications import NotificationCenter, Notification
 
 # -----
 # Relay
@@ -76,14 +76,14 @@ class _NotificationRelay(NSObject):
         meth = None
         if isinstance(observable, NSObject):
             if isinstance(observer, NSObject):
-                meth = None
+                meth = self.removeObjcObserver_notification_objcObservable_
             else:
-                meth = None
+                meth = self.removePythonObserver_notification_objcObservable_
         else:
             if isinstance(observer, NSObject):
-                meth = None
+                meth = self.removeObjcObserver_notification_pythonObservable_
             else:
-                meth = None
+                meth = self.removePythonObserver_notification_pythonObservable_
         meth(observer, notification, observable)
 
     def removeObjcObserver_notification_objcObservable_(self, observer, notification, observable):
@@ -143,7 +143,7 @@ class _NotificationRelay(NSObject):
         self._objCCenter.postNotification_(notification)
 
     def postPythonNotification_observable_userInfo_(self, notification, observable, userInfo):
-        self._pythonCenter.postNotification_(
+        self._pythonCenter.postNotification(
             notification=notification,
             observable=observable,
             data=userInfo
@@ -152,10 +152,14 @@ class _NotificationRelay(NSObject):
     # Internal Routing
 
     def _pythonObservingObjCRelayCallback_(self, notification):
+        name = notification.name()
+        obj = notification.object()
+        data = notification.userData()
         key = (
-            notification.name(),
-            notification.object()
+            name,
+            obj
         )
+        notification = Notification(name=name, objRef=obj, data=data)
         if key in self._pythonObservingObjC:
             for observer, selector in self._pythonObservingObjC[key]:
                 observer = observer()

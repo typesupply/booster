@@ -20,6 +20,9 @@ class AppExtController(object):
     fontWrapperClass = AppExtFont
     documentClass = None
 
+    def __init__(self):
+        self._documents = []
+
     def teardown(self):
         self.menubar.teardownMenu(self.owner)
 
@@ -36,7 +39,7 @@ class AppExtController(object):
         self.userDefaults.registerDefaults(self.owner, userDefaults)
 
     def getUserDefault(self, key, fallback=None):
-        self.userDefaults.getDefault(self.owner, key, fallback=fallback)
+        return self.userDefaults.getDefault(self.owner, key, fallback=fallback)
 
     def setUserDefault(self, key, value):
         self.userDefaults.setDefault(self.owner, key, value)
@@ -117,7 +120,14 @@ class AppExtController(object):
     def newDocument(self, *args, **kwargs):
         kwargs["documentController"] = self
         document = self.documentClass(*args, **kwargs)
+        self._documents.append(document)
         return document
+
+    def closeDocument(self, document):
+        document.postNotification(
+            notification="MM5.Document.Close"
+        )
+        self._documents.remove(document)
 
 
 class AppExtDocument(object):
@@ -141,3 +151,29 @@ class AppExtDocument(object):
 
     documentController = property(_get_documentController, _set_documentController)
 
+
+    # -------------
+    # Notifications
+    # -------------
+
+    def addObserver(self, observer=None, selector=None, notification=None):
+        self.documentController.addObserver(
+            observer=observer,
+            selector=selector,
+            notification=notification,
+            observable=self
+        )
+
+    def removeObserver(self, observer=None, notification=None):
+        self.documentController.removeObserver(
+            observer=observer,
+            notification=notification,
+            observable=self
+        )
+
+    def postNotification(self, notification=None, data=None):
+        self.documentController.postNotification(
+            notification=notification,
+            observable=self,
+            data=data
+        )
