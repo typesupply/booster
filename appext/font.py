@@ -80,15 +80,6 @@ class AppExtBase(object):
     # Representations
     # ---------------
 
-    def registerRepresentationFactory(self, name, factory, destructiveNotifications=None):
-        naked = self.naked()
-        if destructiveNotifications is None:
-            destructiveNotifications = [naked.changeNotificationName]
-        naked.representationFactories[name] = dict(
-            factory=factory,
-            destructiveNotifications=destructiveNotifications
-        )
-
     def getRepresentation(self, name, **kwargs):
         return self.naked().getRepresentation(name, **kwargs)
 
