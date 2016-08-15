@@ -10,6 +10,7 @@ import weakref
 from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
 from appext.notifications import SharedNotificationCenter
+from appext.requests import SharedRequestCenter
 from appext import environment
 from appext.font import *
 
@@ -91,6 +92,19 @@ class AppExtController(object):
             data
         )
 
+    # --------
+    # Requests
+    # --------
+
+    def addResponder(self, responder, selector, request, domain=None):
+        SharedRequestCenter().addResponder(responder, selector, request, domain)
+
+    def removeResponder(self, request, domain=None):
+        SharedRequestCenter().removeResponder(request, domain)
+
+    def postRequest(self, request, domain=None, *args, **kwargs):
+        SharedRequestCenter().removeResponder(request, domain, *args, **kwargs)
+
     # -------
     # Objects
     # -------
@@ -151,7 +165,6 @@ class AppExtDocument(object):
 
     documentController = property(_get_documentController, _set_documentController)
 
-
     # -------------
     # Notifications
     # -------------
@@ -177,3 +190,16 @@ class AppExtDocument(object):
             observable=self,
             data=data
         )
+
+    # --------
+    # Requests
+    # --------
+
+    def addResponder(self, responder, selector, request):
+        self.documentController.addResponder(responder, selector, request, domain=self)
+
+    def removeResponder(self, request):
+        self.documentController.removeResponder(request, domain=self)
+
+    def postRequest(self, request, *args, **kwargs):
+        self.documentController.removeResponder(request, domain=self, *args, **kwargs)

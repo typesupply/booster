@@ -1,7 +1,3 @@
-from AppKit import *
-from vanilla.vanillaBase import VanillaCallbackWrapper
-
-
 """
 The aplication's shared menubar.
 
@@ -25,6 +21,8 @@ Item format:
     }
 """
 
+from AppKit import *
+from vanilla.vanillaBase import VanillaCallbackWrapper
 
 # -------
 # Manager
