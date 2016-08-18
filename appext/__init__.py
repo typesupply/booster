@@ -54,8 +54,8 @@ class AppExtController(object):
 
     menubar = property(_get_menubar)
 
-    def buildMenu(self, title, items):
-        self.menubar.buildMenu(self.owner, title, items)
+    def buildMenu(self, title, items, image=None):
+        self.menubar.buildMenu(self.owner, title, items, image=image)
 
     def getMenuItemData(self, identifier):
         return self.menubar.getItemData(identifier)

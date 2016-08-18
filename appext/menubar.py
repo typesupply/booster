@@ -68,8 +68,10 @@ class _MenubarManager(object):
     # Construction
     # ------------
 
-    def buildMenu(self, owner, title, items):
+    def buildMenu(self, owner, title, items, image=None):
         baseItem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(title, None, "")
+        if image is not None:
+            baseItem.setImage_(image)
         self._mainMenu.insertItem_atIndex_(baseItem, self._mainMenu.numberOfItems() - 1)
         baseMenu = NSMenu.alloc().initWithTitle_(title)
         baseItem.setSubmenu_(baseMenu)
