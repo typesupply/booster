@@ -52,26 +52,7 @@ if environment.inRoboFont:
     NewFont = roboFont.NewFont
     OpenFont = roboFont.OpenFont
 else:
-    from fontParts import nonelab
-    baseFont = nonelab.RFont
-    baseInfo = nonelab.RInfo
-    baseGroups = nonelab.RGroups
-    baseKerning = nonelab.RKerning
-    baseFeatures = nonelab.RFeatures
-    baseLib = nonelab.RLib
-    baseLayer = nonelab.RLayer
-    baseGlyph = nonelab.RGlyph
-    baseContour = nonelab.RContour
-    baseComponent = nonelab.RComponent
-    baseAnchor = nonelab.RAnchor
-    baseGuideline = nonelab.RGuideline
-    baseImage = nonelab.RImage
-    from fontParts import world
-    AllFonts = world.AllFonts
-    CurrentFont = world.CurrentFont
-    CurrentGlyph = world.CurrentGlyph
-    NewFont = world.NewFont
-    OpenFont = world.OpenFont
+    raise NotImplementedError
 
 
 class AppExtBase(object):

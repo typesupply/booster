@@ -34,8 +34,4 @@ class Test(BaseWindowController):
 
 if __name__ == "__main__":
     from appext import environment
-    if environment.inRoboFont:
-        Test()
-    else:
-        from vanilla.test.testTools import executeVanillaTest
-        executeVanillaTest(Test)
+    Test()

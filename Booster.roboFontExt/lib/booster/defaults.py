@@ -15,10 +15,6 @@ if environment.inRoboFont:
 
 class _DefaultsManager(object):
 
-    def __init__(self):
-        if not environment.inRoboFont:
-            self._defaults = {}
-
     def registerDefaults(self, owner, data):
         if owner is not None:
             owner = _makeOwnerStub(owner)
@@ -31,7 +27,7 @@ class _DefaultsManager(object):
         if environment.inRoboFont:
             mojoExtensions.registerExtensionDefaults(data)
         else:
-            self._defaults.update(data)
+            raise NotImplementedError
 
     def getDefault(self, owner, key, fallback=None):
         if owner is not None:
@@ -40,10 +36,7 @@ class _DefaultsManager(object):
         if environment.inRoboFont:
             value = mojoExtensions.getExtensionDefault(key, fallback=fallback)
         else:
-            if key in self._defaults:
-                value = self._defaults[key]
-            else:
-                value = fallback
+            raise NotImplementedError
         value = _normalizeOutgoingData(value)
         return value
 
@@ -55,7 +48,7 @@ class _DefaultsManager(object):
         if environment.inRoboFont:
             mojoExtensions.setExtensionDefault(key, value)
         else:
-            self._defaults[key] = value
+            raise NotImplementedError
 
 
 def _makeOwnerStub(owner):
