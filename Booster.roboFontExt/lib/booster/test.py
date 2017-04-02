@@ -1,6 +1,6 @@
 import vanilla
 from defconAppKit.windows.baseWindow import BaseWindowController
-from appext import ExtensionManager
+from booster import ExtensionManager
 
 class Test(BaseWindowController):
 
@@ -33,5 +33,5 @@ class Test(BaseWindowController):
         self.extensionManager.teardown()
 
 if __name__ == "__main__":
-    from appext import environment
+    from booster import environment
     Test()

@@ -8,7 +8,7 @@ SharedUserDefaults.setDefault("foo", NSColor.redColor())
 
 from Foundation import *
 from AppKit import *
-from appext import environment
+from booster import environment
 if environment.inRoboFont:
     from mojo import extensions as mojoExtensions
 

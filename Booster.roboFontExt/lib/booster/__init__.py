@@ -7,13 +7,13 @@ to Do:
 """
 
 import weakref
-from appext.menubar import SharedMenubar
-from appext.defaults import SharedUserDefaults
-from appext.notifications import SharedNotificationCenter
-from appext.requests import SharedRequestCenter
-from appext.activity import SharedActivityPoller
-from appext import environment
-from appext.font import *
+from booster.menubar import SharedMenubar
+from booster.defaults import SharedUserDefaults
+from booster.notifications import SharedNotificationCenter
+from booster.requests import SharedRequestCenter
+from booster.activity import SharedActivityPoller
+from booster import environment
+from booster.font import *
 
 
 class AppExtController(object):

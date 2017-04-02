@@ -27,7 +27,7 @@ __all__ = [
     "AppExtImage"
 ]
 
-from appext import environment
+from booster import environment
 
 if environment.inRoboFont:
     # XXX Frederik: can you add these to mojo.roboFont?
