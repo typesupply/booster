@@ -11,6 +11,7 @@ from appext.menubar import SharedMenubar
 from appext.defaults import SharedUserDefaults
 from appext.notifications import SharedNotificationCenter
 from appext.requests import SharedRequestCenter
+from appext.activity import SharedActivityPoller
 from appext import environment
 from appext.font import *
 
@@ -104,6 +105,34 @@ class AppExtController(object):
 
     def postRequest(self, request, domain=None, *args, **kwargs):
         SharedRequestCenter().removeResponder(request, domain, *args, **kwargs)
+
+    # --------
+    # Activity
+    # --------
+
+    def addActivityObserver(self,
+            observer, selector,
+            appIsActive=None, # None, True, False
+            sinceUserActivity=2.0, # None, number
+            sinceFontActivity=2.0, # None, number
+            repeat=False # True, False
+        ):
+        info = dict(
+            observer=observer,
+            selector=selector,
+            appIsActive=appIsActive,
+            sinceUserActivity=sinceUserActivity,
+            sinceFontActivity=sinceFontActivity,
+            repeat=repeat
+        )
+        SharedActivityPoller().addObserver_(info)
+
+    def removeActivityObserver(self, observer, selector):
+        info = dict(
+            observer=observer,
+            selector=selector
+        )
+        SharedActivityPoller().addObserver_(info)
 
     # -------
     # Objects
