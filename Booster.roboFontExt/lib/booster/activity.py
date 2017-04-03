@@ -83,7 +83,7 @@ class ActivityPoller(NSObject):
             sinceFontActivity=sinceFontActivity,
             endedFontActivity=endedFontActivity
         )
-        self._notifyObserversForInfo_(info)
+        self._notifyObserversWithInfo_(info)
         # Restart
         if self.polling():
             self._startTimer()
@@ -149,9 +149,9 @@ class ActivityPoller(NSObject):
         sinceFontActivity = info["sinceFontActivity"]
         endedFontActivity = info["endedFontActivity"]
         for (observer, selector), value in self._observers.items():
-            desiredAppIsActive = value["desiredAppIsActive"]
-            desiredUserActivity = value["desiredUserActivity"]
-            desiredFontActivity = value["desiredFontActivity"]
+            desiredAppIsActive = value["appIsActive"]
+            desiredUserActivity = value["sinceUserActivity"]
+            desiredFontActivity = value["sinceFontActivity"]
             repeat = value["repeat"]
             notifiedUserActivity = value["notifiedUserActivity"]
             notifiedFontActivity = value["notifiedFontActivity"]
@@ -174,7 +174,7 @@ class ActivityPoller(NSObject):
             # notify
             observer = observer()
             meth = getattr(observer, selector)
-            meth(self, info)
+            meth(info)
             # store repeat stamp
             value["notifiedUserActivity"] = now
             value["notifiedFontActivity"] = now
@@ -281,5 +281,5 @@ def userIdleTime():
 _fontObserver = _FontObserver()
 _activityPoller = ActivityPoller.alloc().init()
 
-def ShareActivityPoller():
+def SharedActivityPoller():
     return _activityPoller

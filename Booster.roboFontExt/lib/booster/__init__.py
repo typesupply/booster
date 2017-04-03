@@ -12,14 +12,13 @@ from booster.defaults import SharedUserDefaults
 from booster.notifications import SharedNotificationCenter
 from booster.requests import SharedRequestCenter
 from booster.activity import SharedActivityPoller
-from booster import environment
 from booster.font import *
 
 
 class AppExtController(object):
 
     owner = None
-    fontWrapperClass = AppExtFont
+    fontWrapperClass = None
     documentClass = None
 
     def __init__(self):
