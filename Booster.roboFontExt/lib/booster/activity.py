@@ -5,7 +5,7 @@ import subprocess
 import weakref
 from collections import OrderedDict
 from Foundation import NSObject, NSTimer
-from AppKit import NSApp
+from AppKit import NSApp, NSNotificationCenter
 from mojo.events import publishEvent
 from mojo.events import addObserver, removeObserver
 from mojo.roboFont import AllFonts
@@ -26,11 +26,31 @@ class ActivityPoller(NSObject):
     _timer = None
     _interval = getDefaultPollingInterval()
     _lastPoll = None
+    _resignedActiveTime = None
 
     def init(self):
         self = super(ActivityPoller, self).init()
         self._observers = OrderedDict()
+        nc = NSNotificationCenter.defaultCenter()
+        nc.addObserver_selector_name_object_(
+            self,
+            "_appResignedActiveNotificationCallback:",
+            "NSApplicationDidResignActiveNotification",
+            NSApp()
+        )
         return self
+
+    def dealloc(self):
+        nc = NSNotificationCenter.defaultCenter()
+        app.removeObserver_name_object_(
+            self,
+            "NSApplicationDidResignActiveNotification",
+            NSApp()
+        )
+        super(ActivityPoller, self).dealloc()
+
+    def _appResignedActiveNotificationCallback_(self, notification):
+        self._resignedActiveTime = time.time()
 
     # -----
     # Timer
@@ -59,9 +79,11 @@ class ActivityPoller(NSObject):
         # Font activity
         sinceFontActivity, endedFontActivity = _fontObserver.fontIdleTime()
         # User activity
-        sinceUserActivity = None
         if appIsActive:
             sinceUserActivity, endedUserActivity = userIdleTime()
+        else:
+            endedUserActivity = self._resignedActiveTime
+            sinceUserActivity = time.time() - endedUserActivity
         # Activity since last poll
         lastPoll = self._lastPoll
         userActivity = False
