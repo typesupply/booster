@@ -1,14 +1,3 @@
-"""
-to Do:
-- menu item validation so that items
-  with callbacks aren't always active
-- allow the extension to use an icon in
-  the menu bar instead of a title
-- a cross extension manager for fonts
-  opened without UI. this will allow
-  those to be shared across extensions.
-"""
-
 import weakref
 from booster.menubar import SharedMenubar
 from booster.defaults import SharedUserDefaults
