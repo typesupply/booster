@@ -1,0 +1,89 @@
+from mojo.events import addObserver as addAppObserver
+from mojo.events import removeObserver as removeAppObserver
+from mojo.roboFont import AllFonts, OpenFont, CurrentFont
+from booster.objects import BoosterFont
+from booster.activity import SharedActivityPoller
+
+
+class BoosterController(object):
+
+    fontWrapperClass = BoosterFont
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    # ---
+    # App
+    # ---
+
+    def addAppObserver(self, observer, selector, event):
+        addAppObserver(observer, selector, event)
+
+    def removeAppObserver(self, observer, event):
+        removeAppObserver(observer, event)
+
+    # --------
+    # Activity
+    # --------
+
+    def addActivityObserver(self,
+            observer, selector,
+            appIsActive=None, # None, True, False
+            sinceUserActivity=2.0, # None, number
+            sinceFontActivity=2.0, # None, number
+            repeat=False # True, False
+        ):
+        info = dict(
+            observer=observer,
+            selector=selector,
+            appIsActive=appIsActive,
+            sinceUserActivity=sinceUserActivity,
+            sinceFontActivity=sinceFontActivity,
+            repeat=repeat
+        )
+        SharedActivityPoller().addObserver_(info)
+
+    def removeActivityObserver(self, observer, selector):
+        info = dict(
+            observer=observer,
+            selector=selector
+        )
+        SharedActivityPoller().removeObserver_(info)
+
+    # -------
+    # Objects
+    # -------
+
+    def _rewrapFont(self, native):
+        naked = native.naked()
+        wrapped = self.fontWrapperClass(naked)
+        return wrapped
+
+    def getAllFonts(self):
+        fonts = AllFonts()
+        fonts = [self._rewrapFont(native) for native in fonts]
+        for font in fonts:
+            if font.uniqueName is None:
+                font.makeUniqueName(fonts)
+        return fonts
+
+    def getCurrentFont(self):
+        native = CurrentFont()
+        if native is None:
+            return None
+        return self._rewrapFont(native)
+
+    def openFont(self, path, showInterface=True):
+        native = OpenFont(path, showInterface=showInterface)
+        if not showInterface:
+            pass
+        font = self._rewrapFont(native)
+        return font
+
+    def openFonts(self, paths, showInterface=True):
+        fonts = [self.openFont(path, showInterface=showInterface) for path in paths]
+        return fonts
+
