@@ -4,6 +4,7 @@ from defcon.tools.notifications import Notification
 from fontParts.base.base import dynamicProperty
 from mojo.roboFont import RFont, RInfo, RGroups, RKerning, RFeatures, RLib, \
     RLayer, RGlyph, RContour, RComponent, RAnchor, RGuideline, RImage
+from booster.manager import SharedFontManager
 
 
 # --------------
@@ -29,6 +30,12 @@ class TempData(object): pass
 # -------------
 
 class BoosterNotificationMixin(object):
+
+    """
+    This relay is used to wrap the objects sent via
+    notifications in the appropriate wrappers rather
+    than the defcon objects.
+    """
 
     def _get_boosterNotificationReferences(self):
         tempData = self.bstr_tempData
@@ -134,7 +141,31 @@ class BoosterFont(RFont, TempDataMixin, BoosterNotificationMixin):
     layerClass = BoosterLayer
     guidelineClass = BoosterGuideline
 
-    uniqueName = dynamicProperty("uniqueName")
+    # ------------------------
+    # Font Manager Interaction
+    # ------------------------
+
+    def _init(self, pathOrObject=None, showInterface=True, **kwargs):
+        super(BoosterFont, self)._init(pathOrObject, showInterface, **kwargs)
+        manager = SharedFontManager()
+        manager.fontOpened(self)
+
+    def _close(self, save=False):
+        manager = SharedFontManager()
+        manager.fontClosed(self)
+        super(BoosterFont, self)._close(save)
+
+    # -----------
+    # Unique Name
+    # -----------
+
+    uniqueName = dynamicProperty(
+        "uniqueName",
+        doc="""
+            A unique name for use in interfaces. If `None` is returned,
+            call `makeUniqueName` to assign a name to this font.
+            """
+        )
 
     def _get_uniqueName(self):
         if not hasattr(self.bstr_tempData, "bstr_uniqueName"):
@@ -142,6 +173,10 @@ class BoosterFont(RFont, TempDataMixin, BoosterNotificationMixin):
         return self.bstr_tempData.bstr_uniqueName
 
     def makeUniqueName(self, others):
+        """
+        Make a unique name for and assign it to this font.
+        `others` should be all open fonts.
+        """
         existing = set()
         for font in others:
             if font == self:

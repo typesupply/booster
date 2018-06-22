@@ -1,8 +1,8 @@
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
-from mojo.roboFont import AllFonts, OpenFont, CurrentFont
 from booster.objects import BoosterFont
 from booster.activity import SharedActivityPoller
+from booster.manager import SharedFontManager
 
 
 class BoosterController(object):
@@ -63,7 +63,7 @@ class BoosterController(object):
         return wrapped
 
     def getAllFonts(self):
-        fonts = AllFonts()
+        fonts = SharedFontManager().getAllFonts()
         fonts = [self._rewrapFont(native) for native in fonts]
         for font in fonts:
             if font.uniqueName is None:
@@ -71,16 +71,13 @@ class BoosterController(object):
         return fonts
 
     def getCurrentFont(self):
-        native = CurrentFont()
+        native = SharedFontManager().getCurrentFont()
         if native is None:
             return None
         return self._rewrapFont(native)
 
     def openFont(self, path, showInterface=True):
-        native = OpenFont(path, showInterface=showInterface)
-        if not showInterface:
-            pass
-        font = self._rewrapFont(native)
+        font = self.fontWrapperClass(path, showInterface=showInterface)
         return font
 
     def openFonts(self, paths, showInterface=True):
