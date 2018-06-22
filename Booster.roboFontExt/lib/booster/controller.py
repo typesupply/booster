@@ -25,6 +25,16 @@ class BoosterController(object):
     def removeAppObserver(self, observer, event):
         removeAppObserver(observer, event)
 
+    # ------------
+    # Font Manager
+    # ------------
+
+    def addFontManagerObserver(self, observer, selector, event):
+        pass
+
+    def removeFontManagerObserver(self, observer, event):
+        pass
+
     # --------
     # Activity
     # --------

@@ -13,12 +13,38 @@ from mojo.events import removeObserver as removeAppObserver
 class BoosterFontManager(object):
 
     def __init__(self):
-        self._noInterface = []
+        self._noInterface = set()
         addOppObserver(self, "_fontDidOpenNotificationCallback", "fontDidOpen")
         addOppObserver(self, "_newFontDidOpenNotificationCallback", "newFontDidOpen")
         addOppObserver(self, "_fontWillCloseNotificationCallback", "fontWillClose")
 
+    def fontOpened(self, font):
+        if not font.hasInterface():
+            self._noInterface.add(font)
+
+    def fontClosed(self, font):
+        if not font.hasInterface() and font in self._noInterface:
+            self._noInterface.remove(font)
+
+    def getAllFonts(self):
+        from mojo.roboFont import AllFonts, FontList
+        fonts = AllFonts() + list(self._noInterface)
+        fonts = FontList(fonts)
+        return fonts
+
+    def getCurrentFont(self):
+        from mojo.roboFont import CurrentFont
+        return CurrentFont()
+
+    # -------------
     # Notifications
+    # -------------
+
+    def addObserver(self, observer, selector, notification):
+        pass
+
+    def removeObserver(self, observer, selector, notification):
+        pass
 
     def _fontDidOpenNotificationCallback(self, info):
         font = info["font"]
@@ -32,23 +58,7 @@ class BoosterFontManager(object):
         font = info["font"]
         self.fontClosed(font)
 
-    def fontOpened(self, font):
-        if not font.hasInterface() and font not in self._noInterface:
-            self._noInterface.append(font)
 
-    def fontClosed(self, font):
-        if not font.hasInterface() and font in self._noInterface:
-            self._noInterface.remove(font)
-
-    def getAllFonts(self):
-        from mojo.roboFont import AllFonts, FontList
-        fonts = AllFonts() + self._noInterface
-        fonts = FontList(fonts)
-        return fonts
-
-    def getCurrentFont(self):
-        from mojo.roboFont import CurrentFont
-        return CurrentFont()
 
 
 # ----
