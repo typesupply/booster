@@ -6,7 +6,6 @@ import weakref
 from collections import OrderedDict
 from Foundation import NSObject, NSTimer
 from AppKit import NSApp, NSNotificationCenter
-from mojo.events import publishEvent
 from mojo.events import addObserver, removeObserver
 from mojo.roboFont import AllFonts
 from booster.debug import ClassNameIncrementer

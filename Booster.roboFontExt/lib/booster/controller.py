@@ -3,37 +3,68 @@ from mojo.events import removeObserver as removeAppObserver
 from booster.objects import BoosterFont
 from booster.activity import SharedActivityPoller
 from booster.manager import SharedFontManager
+from booster.notifications import BoosterNotificationMixin
 
 
-class BoosterController(object):
+class BoosterController(BoosterNotificationMixin):
+
+    """
+    Notifications:
+    - fontDidOpen
+    - fontWillClose
+    - availableFontsChanged
+    """
 
     fontWrapperClass = BoosterFont
 
     def start(self):
-        pass
+        self._beginInternalObservations()
 
     def stop(self):
-        pass
+        self._stopInternalObservations()
+
+    def _beginInternalObservations(self):
+        manager = SharedFontManager()
+        manager.addObserver(observer=self, selector="_fontManagerFontOpenedNotificationCallback", notification="bstr.fontDidOpen")
+        manager.addObserver(observer=self, selector="_fontManagerFontClosedNotificationCallback", notification="bstr.fontWillClose")
+        manager.addObserver(observer=self, selector="_fontManagerAvailableFontsChangedNotificationCallback", notification="bstr.availableFontsChanged")
+
+    def _stopInternalObservations(self):
+        manager = SharedFontManager()
+        manager.removeObserver(observer=self, notification="bstr.fontDidOpen")
+        manager.removeObserver(observer=self, notification="bstr.fontWillClose")
+        manager.removeObserver(observer=self, notification="bstr.availableFontsChanged")
 
     # ---
     # App
     # ---
 
-    def addAppObserver(self, observer, selector, event):
+    def addAppObserver(self, observer, selector, notification):
         addAppObserver(observer, selector, event)
 
-    def removeAppObserver(self, observer, event):
+    def removeAppObserver(self, observer, notification):
         removeAppObserver(observer, event)
 
     # ------------
     # Font Manager
     # ------------
 
-    def addFontManagerObserver(self, observer, selector, event):
-        pass
+    def _fontManagerFontOpenedNotificationCallback(self, notification):
+        name = notification.name
+        font = notification.data["font"]
+        self._rewrapFont(font)
+        self.postNotification(name, dict(font=font))
 
-    def removeFontManagerObserver(self, observer, event):
-        pass
+    def _fontManagerFontClosedNotificationCallback(self, notification):
+        name = notification.name
+        font = notification.data["font"]
+        self._rewrapFont(font)
+        self.postNotification(name, dict(font=font))
+
+    def _fontManagerAvailableFontsChangedNotificationCallback(self, notification):
+        name = notification.name
+        self.getAllFonts()
+        self.postNotification(name, dict(fonts=self.getAllFonts()))
 
     # --------
     # Activity

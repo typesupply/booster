@@ -29,7 +29,7 @@ class TempData(object): pass
 # Notifications
 # -------------
 
-class BoosterNotificationMixin(object):
+class BoosterDefconNotificationMixin(object):
 
     """
     This relay is used to wrap the objects sent via
@@ -85,37 +85,37 @@ class BoosterNotificationMixin(object):
 # ------------------
 
 
-class BoosterInfo(RInfo, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterInfo(RInfo, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterGroups(RGroups, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterGroups(RGroups, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterKerning(RKerning, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterKerning(RKerning, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterFeatures(RFeatures, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterFeatures(RFeatures, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterLib(RLib, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterLib(RLib, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterContour(RContour, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterContour(RContour, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterComponent(RComponent, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterComponent(RComponent, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterAnchor(RAnchor, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterAnchor(RAnchor, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterGuideline(RGuideline, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterGuideline(RGuideline, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterImage(RImage, TempDataMixin, BoosterNotificationMixin): pass
+class BoosterImage(RImage, TempDataMixin, BoosterDefconNotificationMixin): pass
 
 
-class BoosterGlyph(RGlyph, TempDataMixin, BoosterNotificationMixin):
+class BoosterGlyph(RGlyph, TempDataMixin, BoosterDefconNotificationMixin):
 
     contourClass = BoosterContour
     componentClass = BoosterComponent
@@ -125,13 +125,13 @@ class BoosterGlyph(RGlyph, TempDataMixin, BoosterNotificationMixin):
     libClass = BoosterLib
 
 
-class BoosterLayer(RLayer, TempDataMixin, BoosterNotificationMixin):
+class BoosterLayer(RLayer, TempDataMixin, BoosterDefconNotificationMixin):
 
     libClass = BoosterLib
     glyphClass = BoosterGlyph
 
 
-class BoosterFont(RFont, TempDataMixin, BoosterNotificationMixin):
+class BoosterFont(RFont, TempDataMixin, BoosterDefconNotificationMixin):
 
     infoClass = BoosterInfo
     groupsClass = BoosterGroups
@@ -147,12 +147,15 @@ class BoosterFont(RFont, TempDataMixin, BoosterNotificationMixin):
 
     def _init(self, pathOrObject=None, showInterface=True, **kwargs):
         super(BoosterFont, self)._init(pathOrObject, showInterface, **kwargs)
-        manager = SharedFontManager()
-        manager.fontOpened(self)
+        # don't announce ths as a new font
+        # if it's an already loaded object.
+        if pathOrObject is None or isinstance(pathOrObject, str):
+            manager = SharedFontManager()
+            manager.fontDidOpen(self)
 
     def _close(self, save=False):
         manager = SharedFontManager()
-        manager.fontClosed(self)
+        manager.fontWillClose(self)
         super(BoosterFont, self)._close(save)
 
     # -----------

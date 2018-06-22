@@ -1,35 +1,36 @@
-"""
-This needs to be observable.
-
-- font opened
-- font closed
-- new font opened
-- available fonts changed
-"""
-
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
+from booster.notifications import BoosterNotificationMixin
 
-class BoosterFontManager(object):
+
+class BoosterFontManager(BoosterNotificationMixin):
 
     def __init__(self):
         self._noInterface = set()
-        addOppObserver(self, "_fontDidOpenNotificationCallback", "fontDidOpen")
-        addOppObserver(self, "_newFontDidOpenNotificationCallback", "newFontDidOpen")
-        addOppObserver(self, "_fontWillCloseNotificationCallback", "fontWillClose")
+        addAppObserver(self, "_fontDidOpenNotificationCallback", "fontDidOpen")
+        addAppObserver(self, "_newFontDidOpenNotificationCallback", "newFontDidOpen")
+        addAppObserver(self, "_fontWillCloseNotificationCallback", "fontWillClose")
+        addAppObserver(self, "_fontDidCloseNotificationCallback", "fontDidClose")
 
-    def fontOpened(self, font):
+    def fontDidOpen(self, font):
         if not font.hasInterface():
             self._noInterface.add(font)
+        self.postNotification("bstr.fontDidOpen", data=dict(font=font))
+        self.postNotification("bstr.availableFontsChanged", data=dict(fonts=self.getAllFonts()))
 
-    def fontClosed(self, font):
+    def fontWillClose(self, font):
         if not font.hasInterface() and font in self._noInterface:
             self._noInterface.remove(font)
+        self.postNotification("bstr.fontWillClose", data=dict(font=font))
+
+    def fontDidClose(self):
+        self.postNotification("bstr.fontDidClose")
+        self.postNotification("bstr.availableFontsChanged", data=dict(fonts=self.getAllFonts()))
 
     def getAllFonts(self):
-        from mojo.roboFont import AllFonts, FontList
+        from mojo.roboFont import AllFonts #, FontList
         fonts = AllFonts() + list(self._noInterface)
-        fonts = FontList(fonts)
+        # fonts = FontList(fonts)
         return fonts
 
     def getCurrentFont(self):
@@ -40,26 +41,20 @@ class BoosterFontManager(object):
     # Notifications
     # -------------
 
-    def addObserver(self, observer, selector, notification):
-        pass
-
-    def removeObserver(self, observer, selector, notification):
-        pass
-
     def _fontDidOpenNotificationCallback(self, info):
         font = info["font"]
-        self.fontOpened(font)
+        self.fontDidOpen(font)
 
     def _newFontDidOpenNotificationCallback(self, info):
         font = info["font"]
-        self.fontOpened(font)
+        self.fontDidOpen(font)
 
     def _fontWillCloseNotificationCallback(self, info):
         font = info["font"]
-        self.fontClosed(font)
+        self.fontWillClose(font)
 
-
-
+    def _fontDidCloseNotificationCallback(self, info):
+        self.fontDidClose()
 
 # ----
 # Main
