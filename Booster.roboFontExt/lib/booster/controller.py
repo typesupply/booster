@@ -100,7 +100,7 @@ class BoosterController(BoosterNotificationMixin):
 
     def _rewrapFont(self, native):
         naked = native.naked()
-        wrapped = self.fontWrapperClass(naked)
+        wrapped = self.fontWrapperClass(naked, showInterface=native.hasInterface())
         return wrapped
 
     def getAllFonts(self):

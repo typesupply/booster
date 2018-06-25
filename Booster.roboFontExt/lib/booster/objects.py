@@ -13,13 +13,13 @@ from booster.manager import SharedFontManager
 
 class TempDataMixin(object):
 
-    bstr_tempData = dynamicProperty("boosterTempData")
+    bstr_tempData = dynamicProperty("bstr_tempData")
 
-    def _get_boosterTempData(self):
+    def _get_bstr_tempData(self):
         obj = self.naked()
-        if not hasattr(obj, "bstr_tempData"):
-            obj.bstr_tempData = TempData()
-        return obj.bstr_tempData
+        if not hasattr(obj, "_bstr_tempData"):
+            obj._bstr_tempData = TempData()
+        return obj._bstr_tempData
 
 
 class TempData(object): pass
@@ -147,9 +147,15 @@ class BoosterFont(RFont, TempDataMixin, BoosterDefconNotificationMixin):
 
     def _init(self, pathOrObject=None, showInterface=True, **kwargs):
         super(BoosterFont, self)._init(pathOrObject, showInterface, **kwargs)
-        # don't announce ths as a new font
-        # if it's an already loaded object.
+        # don't announce ths as a new font if
+        # the font manager has already seen it.
+        announce = False
         if pathOrObject is None or isinstance(pathOrObject, str):
+            announce = True
+        elif not hasattr(pathOrObject, "_bstr_tempData"):
+            d = self.bstr_tempData
+            announce = True
+        if announce:
             manager = SharedFontManager()
             manager.fontDidOpen(self)
 
