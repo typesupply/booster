@@ -40,10 +40,10 @@ class BoosterController(BoosterNotificationMixin):
     # ---
 
     def addAppObserver(self, observer, selector, notification):
-        addAppObserver(observer, selector, event)
+        addAppObserver(observer, selector, notification)
 
     def removeAppObserver(self, observer, notification):
-        removeAppObserver(observer, event)
+        removeAppObserver(observer, notification)
 
     # ------------
     # Font Manager

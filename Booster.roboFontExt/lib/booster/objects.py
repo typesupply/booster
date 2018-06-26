@@ -79,6 +79,16 @@ class BoosterDefconNotificationMixin(object):
             observable = self.naked()
             observable.removeObserver(self, notification)
 
+    def bstr_hasObserver(self, observer, notification):
+        if notification in self._bstr_notificationReferences:
+            observer = weakref.ref(observer)
+            if observer in self._bstr_notificationReferences[notification]:
+                return True
+        return False
+
+    def postNotification(self, notification, data=None):
+        self.naked().postNotification(notification, data=data)
+
 
 # ------------------
 # FontParts Wrappers
