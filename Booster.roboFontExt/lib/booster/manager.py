@@ -12,15 +12,27 @@ class BoosterFontManager(BoosterNotificationMixin):
         addAppObserver(self, "_fontWillCloseNotificationCallback", "fontWillClose")
         addAppObserver(self, "_fontDidCloseNotificationCallback", "fontDidClose")
 
+    def _removeFromNoInterface(self, font):
+        naked = font.naked()
+        for other in self._noInterface:
+            if other.naked() == naked:
+                self._noInterface.remove(other)
+                break
+            if font.path is not None and other.path == font.path:
+                self._noInterface.remove(other)
+                break
+
     def fontDidOpen(self, font):
         if not font.hasInterface():
             self._noInterface.add(font)
+        else:
+            self._removeFromNoInterface(font)
         self.postNotification("bstr.fontDidOpen", data=dict(font=font))
         self.postNotification("bstr.availableFontsChanged", data=dict(fonts=self.getAllFonts()))
 
     def fontWillClose(self, font):
-        if not font.hasInterface() and font in self._noInterface:
-            self._noInterface.remove(font)
+        if not font.hasInterface():
+            self._removeFromNoInterface(font)
         self.postNotification("bstr.fontWillClose", data=dict(font=font))
 
     def fontDidClose(self):
