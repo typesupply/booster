@@ -1,6 +1,4 @@
 import weakref
-from collections import OrderedDict
-from defcon.tools.notifications import Notification
 from fontParts.base.base import dynamicProperty
 from mojo.roboFont import RFont, RInfo, RGroups, RKerning, RFeatures, RLib, \
     RLayer, RGlyph, RContour, RComponent, RAnchor, RGuideline, RImage
@@ -31,63 +29,11 @@ class TempData(object): pass
 
 class BoosterDefconNotificationMixin(object):
 
-    """
-    This relay is used to wrap the objects sent via
-    notifications in the appropriate wrappers rather
-    than the defcon objects.
-    """
-
-    def _get_boosterNotificationReferences(self):
-        tempData = self.bstr_tempData
-        if not hasattr(tempData, "bstr_notificationReferences"):
-            tempData.bstr_notificationReferences = {}
-        return tempData.bstr_notificationReferences
-
-    _bstr_notificationReferences = property(_get_boosterNotificationReferences)
-
-    def _notificationRelay(self, notification):
-        name = notification.name
-        wrapped = Notification(
-            name,
-            weakref.ref(self),
-            notification.data
-        )
-        notificationReferences = self._bstr_notificationReferences
-        observers = notificationReferences.get(name)
-        if observers:
-            for observer, selector in observers.items():
-                observer = observer()
-                if observer is None:
-                    continue
-                meth = getattr(observer, selector)
-                meth(wrapped)
-
-    def bstr_addObserver(self, observer, selector, notification):
-        observer = weakref.ref(observer)
-        notificationReferences = self._bstr_notificationReferences
-        if notification not in notificationReferences:
-            notificationReferences[notification] = OrderedDict()
-        notificationReferences[notification][observer] = selector
-        observable = self.naked()
-        observable.addObserver(self, "_notificationRelay", notification)
-
-    def bstr_removeObserver(self, observer, notification):
-        observer = weakref.ref(observer)
-        notificationReferences = self._bstr_notificationReferences
-        del notificationReferences[notification][observer]
-        if not notificationReferences[notification]:
-            observable = self.naked()
-            observable.removeObserver(self, notification)
-
-    def bstr_hasObserver(self, observer, notification):
-        if notification in self._bstr_notificationReferences:
-            observer = weakref.ref(observer)
-            if observer in self._bstr_notificationReferences[notification]:
-                return True
-        return False
-
-    def postNotification(self, notification, data=None):
-        self.naked().postNotification(notification, data=data)
+    def bstr_postNotification(self, notification, data=None):
+        if hasattr(self, "postNotification"):
+            self.postNotification(notification, data=data)
+        else:
+            self.naked().postNotification(notification, data=data)
 
 
 # ------------------
