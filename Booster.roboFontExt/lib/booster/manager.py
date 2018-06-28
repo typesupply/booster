@@ -7,6 +7,7 @@ class BoosterFontManager(BoosterNotificationMixin):
 
     def __init__(self):
         self._noInterface = set()
+        self._fontChangingVisibility = None
         addAppObserver(self, "_fontDidOpenNotificationCallback", "fontDidOpen")
         addAppObserver(self, "_newFontDidOpenNotificationCallback", "newFontDidOpen")
         addAppObserver(self, "_fontWillCloseNotificationCallback", "fontWillClose")
@@ -22,7 +23,28 @@ class BoosterFontManager(BoosterNotificationMixin):
                 self._noInterface.remove(other)
                 break
 
+    def fontWillChangeVisibility(self, font):
+        """
+        This is needed because turning visibility off
+        causes RF to send out notifications that the
+        font has been closed. These notifications
+        are indistinguishable for the notifications
+        sent by other "real" document close actions.
+        So, this makes a note to not pay attention
+        tp the incoming notifications.
+        """
+        self._fontChangingVisibility = font
+
+    def fontDidChangeVisibility(self, font):
+        if font in self._noInterface:
+            self._noInterface.remove(font)
+        else:
+            self._noInterface.add(font)
+        self._fontChangingVisibility = None
+
     def fontDidOpen(self, font):
+        if self._fontChangingVisibility == font:
+            return
         if not font.hasInterface():
             self._noInterface.add(font)
         else:
@@ -31,11 +53,15 @@ class BoosterFontManager(BoosterNotificationMixin):
         self.postNotification("bstr.availableFontsChanged", data=dict(fonts=self.getAllFonts()))
 
     def fontWillClose(self, font):
+        if self._fontChangingVisibility == font:
+            return
         if not font.hasInterface():
             self._removeFromNoInterface(font)
         self.postNotification("bstr.fontWillClose", data=dict(font=font))
 
     def fontDidClose(self):
+        if self._fontChangingVisibility is not None:
+            return
         self.postNotification("bstr.fontDidClose")
         self.postNotification("bstr.availableFontsChanged", data=dict(fonts=self.getAllFonts()))
 

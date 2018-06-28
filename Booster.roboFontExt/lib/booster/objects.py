@@ -115,10 +115,10 @@ class BoosterFont(RFont, TempDataMixin, BoosterDefconNotificationMixin):
             manager = SharedFontManager()
             manager.fontDidOpen(self)
 
-    def _close(self, save=False):
+    def _close(self, **kwargs):
         manager = SharedFontManager()
         manager.fontWillClose(self)
-        super(BoosterFont, self)._close(save)
+        super(BoosterFont, self)._close(**kwargs)
 
     # -----------
     # Unique Name

@@ -60,13 +60,13 @@ class BoosterController(BoosterNotificationMixin):
     def _fontManagerFontOpenedNotificationCallback(self, notification):
         name = notification.name
         font = notification.data["font"]
-        self._rewrapFont(font)
+        font = self._rewrapFont(font)
         self.postNotification(name, dict(font=font))
 
     def _fontManagerFontClosedNotificationCallback(self, notification):
         name = notification.name
         font = notification.data["font"]
-        self._rewrapFont(font)
+        font = self._rewrapFont(font)
         self.postNotification(name, dict(font=font))
 
     def _fontManagerAvailableFontsChangedNotificationCallback(self, notification):
@@ -117,7 +117,7 @@ class BoosterController(BoosterNotificationMixin):
             native = RFont(naked)
         else:
             naked = native.naked()
-        wrapped = self.fontWrapperClass(naked, showInterface=native.hasInterface())
+        wrapped = self.fontWrapperClass(naked, showInterface=native.hasInterface(), document=native.document())
         return wrapped
 
     def getAllFonts(self):
@@ -141,6 +141,11 @@ class BoosterController(BoosterNotificationMixin):
     def openFonts(self, paths, showInterface=True):
         fonts = [self.openFont(path, showInterface=showInterface) for path in paths]
         return fonts
+
+    def openInterface(self):
+        super(BoosterFont, self).openInterface()
+        manager = SharedFontManager()
+        manager.fontChangedVisibility(self)
 
     # observation
 
