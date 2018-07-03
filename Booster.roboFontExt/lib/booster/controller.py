@@ -1,7 +1,7 @@
 import weakref
 from collections import OrderedDict
 from defcon.tools.notifications import Notification
-from mojo.roboFont import RFont
+from mojo.roboFont import RFont, CurrentGlyph
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
 from booster.objects import BoosterFont
@@ -133,6 +133,17 @@ class BoosterController(BoosterNotificationMixin):
         if native is None:
             return None
         return self._rewrapFont(native)
+
+    def getCurrentGlyph(self):
+        glyph = CurrentGlyph()
+        if glyph is None:
+            return None
+        layer = glyph.layer
+        layerName = layer.name
+        font = self._rewrapFont(glyph.font)
+        layer = font.getLayer(layerName)
+        glyph = layer[glyph.name]
+        return glyph
 
     def openFont(self, path, showInterface=True):
         font = self.fontWrapperClass(path, showInterface=showInterface)
