@@ -4,6 +4,7 @@ from defcon.tools.notifications import Notification
 from mojo.roboFont import RFont, CurrentGlyph
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
+from mojo import extensions
 from booster.objects import BoosterFont
 from booster.activity import SharedActivityPoller
 from booster.manager import SharedFontManager
@@ -20,6 +21,7 @@ class BoosterController(BoosterNotificationMixin):
     """
 
     fontWrapperClass = BoosterFont
+    identifier = None
 
     def __init__(self):
         self._fontObservervations = {}
@@ -42,6 +44,36 @@ class BoosterController(BoosterNotificationMixin):
         manager.removeObserver(observer=self, notification="bstr.fontDidOpen")
         manager.removeObserver(observer=self, notification="bstr.fontWillClose")
         manager.removeObserver(observer=self, notification="bstr.availableFontsChanged")
+
+    # --------
+    # Defaults
+    # --------
+
+    def _makeDefaultKey(self, key):
+        return self.identifier + "." + key
+
+    def registerDefaults(self, defaults):
+        d = {}
+        for k, v in defaults.items():
+            k = self._makeDefaultKey(k)
+            d[k] = v
+        extensions.registerExtensionDefaults(d)
+
+    def getDefault(self, key, fallback=None):
+        key = self._makeDefaultKey(key)
+        return extensions.getExtensionDefault(key, fallback=fallback)
+
+    def getDefaultColor(self, fallback=None):
+        key = self._makeDefaultKey(key)
+        return extensions.getExtensionDefaultColor(key, fallback=fallback)
+
+    def setDefault(self, key, value):
+        key = self._makeDefaultKey(key)
+        extensions.setExtensionDefault(key, value)
+
+    def setDefaultColor(self, key, value):
+        key = self._makeDefaultKey(key)
+        extensions.setExtensionDefaultColor(key, value)
 
     # ---
     # App
