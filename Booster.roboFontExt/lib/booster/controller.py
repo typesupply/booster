@@ -9,6 +9,7 @@ from booster.objects import BoosterFont
 from booster.activity import SharedActivityPoller
 from booster.manager import SharedFontManager
 from booster.notifications import BoosterNotificationMixin
+from booseer.requests import SharedRequestCenter
 
 
 class BoosterController(BoosterNotificationMixin):
@@ -44,6 +45,19 @@ class BoosterController(BoosterNotificationMixin):
         manager.removeObserver(observer=self, notification="bstr.fontDidOpen")
         manager.removeObserver(observer=self, notification="bstr.fontWillClose")
         manager.removeObserver(observer=self, notification="bstr.availableFontsChanged")
+
+    # --------
+    # Requests
+    # --------
+
+    def addResponder(self, responder, selector, request):
+        SharedRequestCenter().addResponder(responder, selector, request)
+
+    def removeResponder(self, request):
+        SharedRequestCenter().removeResponder(request)
+
+    def postRequest(self, request, *args, **kwargs):
+        SharedRequestCenter().removeResponder(request, *args, **kwargs)
 
     # --------
     # Defaults
