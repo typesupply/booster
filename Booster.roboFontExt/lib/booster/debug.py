@@ -1,9 +1,18 @@
+"""
+-----
+Debug
+-----
+
+This implements Just's clever class name incrementer
+to deal with the limitations of the Obj-C namespace.
+"""
+
+# XXX
+# This needs a heuristic to make sure that this is off
+# when necessary. Or, maybe there is an external way to
+# turn it off. booster.debug.setState(False) or something.
+
 debug = True
-
-
-# --------------------------
-# obj-c namespace workaround
-# --------------------------
 
 ClassNameIncrementer = None
 

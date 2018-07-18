@@ -1,3 +1,54 @@
+"""
+---------------
+Booster Objects
+---------------
+
+These objects are subclasses of the RoboFont wrapper classes,
+so support everything that the RoboFont and fontParts objects
+do. They also implement some important functionality required
+by Booster along with some other useful functionality. If you
+are building a Booster based extension, you must use these
+classes or your own subclasses of them.
+
+Here are the big things that these implement:
+
+
+Temporary Data Storage
+----------------------
+
+Each object has a bstr_tempData sub-object. This is a container
+for storing data that does not need to be retained in the written
+UFO. The values are written to attributes of your own design.
+So, you know, make the attribute names unique. I suggest that
+you use an identifier, then an underscore and then a descriptive
+tag. (This is the same as the fontParts environment specific
+method/attribute naming system.) Here's how you set something:
+
+    something.bstr_tempData.blah_number = 13
+
+Here's how you get something:
+
+    text = "blah" * something.bstr_tempData.blah_number
+
+The values are completely up to you. It can be a standard type,
+a custom object or whatever. The data will be stored in the
+low-level defcon objects, so if your object wrapper is lost,
+you can still get it by rewrapping the lower-level object.
+
+
+Automatic Font Manager Interaction
+----------------------------------
+
+The font class will alert the font manager when a font is
+opened/closed regardless of whether it has an interface or not.
+It is extremely important that you close fonts without interfaces
+once you are done using them. The font manager will retain a reference
+to them and they will stay in memory until you close them.
+
+
+See below for additional things.
+"""
+
 import weakref
 from fontParts.base.base import dynamicProperty
 from mojo.roboFont import RFont, RInfo, RGroups, RKerning, RFeatures, RLib, \
@@ -127,7 +178,7 @@ class BoosterFont(RFont, TempDataMixin, BoosterDefconNotificationMixin):
     uniqueName = dynamicProperty(
         "uniqueName",
         doc="""
-            A unique name for use in interfaces. If `None` is returned,
+            A unique name for the font. If `None` is returned,
             call `makeUniqueName` to assign a name to this font.
             """
         )
@@ -140,7 +191,11 @@ class BoosterFont(RFont, TempDataMixin, BoosterDefconNotificationMixin):
     def makeUniqueName(self, others):
         """
         Make a unique name for and assign it to this font.
-        `others` should be all open fonts.
+        `others` should be all open fonts. This name is suitable
+        for use as informative text in interface controls (such
+        as font selection controls) but should not be used for
+        storage, reference or anything else that requires
+        reproducability.
         """
         existing = set()
         for font in others:

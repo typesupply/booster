@@ -1,3 +1,12 @@
+"""
+------------------------
+SharedNotificationCenter
+------------------------
+
+This provides notification support to various objects.
+Refer to defcon.tools.notifications for documentation.
+"""
+
 from defcon.tools.notifications import NotificationCenter
 
 class BoosterNotificationMixin(object):
