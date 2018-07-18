@@ -20,7 +20,7 @@ The manager allows subscribing to the following notifications:
 
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
-from booster.notifications import BoosterNotificationMixin
+from .notifications import BoosterNotificationMixin
 
 
 class BoosterFontManager(BoosterNotificationMixin):

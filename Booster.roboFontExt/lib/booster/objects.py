@@ -53,7 +53,7 @@ import weakref
 from fontParts.base.base import dynamicProperty
 from mojo.roboFont import RFont, RInfo, RGroups, RKerning, RFeatures, RLib, \
     RLayer, RGlyph, RContour, RComponent, RAnchor, RGuideline, RImage
-from booster.manager import SharedFontManager
+from .manager import SharedFontManager
 
 
 # --------------

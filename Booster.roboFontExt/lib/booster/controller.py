@@ -35,11 +35,11 @@ from mojo.roboFont import RFont, CurrentGlyph
 from mojo.events import addObserver as addAppObserver
 from mojo.events import removeObserver as removeAppObserver
 from mojo import extensions
-from booster.objects import BoosterFont
-from booster.activity import SharedActivityPoller
-from booster.manager import SharedFontManager
-from booster.notifications import BoosterNotificationMixin
-from booseer.requests import SharedRequestCenter
+from .objects import BoosterFont
+from .activity import SharedActivityPoller
+from .manager import SharedFontManager
+from .notifications import BoosterNotificationMixin
+from .requests import SharedRequestCenter
 
 
 class BoosterController(BoosterNotificationMixin):

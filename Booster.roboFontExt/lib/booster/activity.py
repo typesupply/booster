@@ -26,7 +26,7 @@ from Foundation import NSObject, NSTimer
 from AppKit import NSApp, NSNotificationCenter
 from mojo.events import addObserver, removeObserver
 from mojo.roboFont import AllFonts
-from booster.debug import ClassNameIncrementer
+from .debug import ClassNameIncrementer
 
 # --------
 # Defaults
