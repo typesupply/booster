@@ -2,7 +2,7 @@
 This is a tool for monitoring the internals of Booster.
 """
 
-from AppKit import NSTimer
+from AppKit import NSApp, NSTimer
 import vanilla
 from defconAppKit.windows.baseWindow import BaseWindowController
 from booster.controller import BoosterController
@@ -19,7 +19,15 @@ class BoosterStatusMonitorController(BoosterController):
 
     def start(self):
         super(BoosterStatusMonitorController, self).start()
+        app = NSApp()
+        app.boosterMonitor = self
         self.addResponder(self, "showStatusPanelResponder", "BoosterMonitor.ShowStatusPanel")
+
+    def stop(self):
+        super(BoosterStatusMonitorController, self).stop()
+        app = NSApp()
+        app.boosterMonitor = None
+        self.removeResponder("BoosterMonitor.ShowStatusPanel")
 
     def showStatusPanelResponder(self):
         if self.statusPanel is None:
@@ -211,5 +219,6 @@ class BoosterStatusMonitorPanelController(BaseWindowController):
         self.requestsTab.list.set(items)
 
 
-monitor = BoosterStatusMonitorController()
-monitor.start()
+if __name__ == "__main__":
+    monitor = BoosterStatusMonitorController()
+    monitor.start()
