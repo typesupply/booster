@@ -102,24 +102,11 @@ class ActivityPoller(NSObject, metaclass=ClassNameIncrementer):
         else:
             endedUserActivity = self._resignedActiveTime
             sinceUserActivity = time.time() - endedUserActivity
-        # Activity since last poll
-        lastPoll = self._lastPoll
-        userActivity = False
-        fontActivity = False
-        now = time.time()
-        self._lastPoll = now
-        if lastPoll is not None:
-            sinceLastPoll = now - lastPoll
-            fontActivity = sinceFontActivity < sinceLastPoll
-            if sinceUserActivity is not None:
-                userActivity = sinceUserActivity < sinceLastPoll
         # Notify observers
         info = dict(
             appIsActive=appIsActive,
-            userActivity=userActivity,
             sinceUserActivity=sinceUserActivity,
             endedUserActivity=endedUserActivity,
-            fontActivity=fontActivity,
             sinceFontActivity=sinceFontActivity,
             endedFontActivity=endedFontActivity
         )
@@ -207,12 +194,8 @@ class ActivityPoller(NSObject, metaclass=ClassNameIncrementer):
 
             {
                   appIsActive : Boolean indicating if the app is active.
-                 userActivity : Boolean indicating if user activity has
-                                occured since the last poll.
             sinceUserActivity : Seconds since the last user activity.
             endedUserActivity : When the last user activity occured.
-                 fontActivity : Boolean indicating if font activity has
-                                occured since the last poll.
             sinceFontActivity : Seconds since the last font activity.
             endedFontActivity : When the last font activity occured.
             }
@@ -229,6 +212,16 @@ class ActivityPoller(NSObject, metaclass=ClassNameIncrementer):
             notifiedUserActivity=None
         )
         self._observers[observer, selector] = value
+        intervals = []
+        for info in self._observers.values():
+            if "sinceUserActivity" in info:
+                intervals.append(info["sinceUserActivity"])
+            if "sinceUserActivity" in info:
+                intervals.append(info["sinceFontActivity"])
+        if not intervals:
+            self._interval = getDefaultPollingInterval()
+        else:
+            self._interval = min(intervals)
         if self.polling():
             self.stopPolling()
         self.startPolling()

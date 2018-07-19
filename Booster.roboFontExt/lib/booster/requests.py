@@ -37,8 +37,9 @@ To send a request, you do this:
 """
 
 import weakref
+from booster.notifications import BoosterNotificationMixin
 
-class BoosterRequestCenter(object):
+class BoosterRequestCenter(BoosterNotificationMixin):
 
     def __init__(self):
         self.responders = {}
@@ -53,6 +54,7 @@ class BoosterRequestCenter(object):
         """
         responder = weakref.ref(responder)
         self.responders[request] = (responder, selector)
+        self.postNotification("BoosterRequestSenter.AddedResponder")
 
     def removeResponder(self, request):
         """
@@ -61,6 +63,7 @@ class BoosterRequestCenter(object):
         request: a string naming the request.
         """
         del self.responders[request]
+        self.postNotification("BoosterRequestSenter.RemovedResponder")
 
     def postRequest(self, request, *args, **kwargs):
         """
