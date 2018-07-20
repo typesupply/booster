@@ -20,7 +20,7 @@ class BoosterStatusMonitorController(BoosterController):
     def start(self):
         super(BoosterStatusMonitorController, self).start()
         app = NSApp()
-        app.boosterMonitor = self
+        app.com_typesupply_boosterMonitor = self
         self.addResponder(self, "showStatusPanelResponder", "BoosterMonitor.ShowStatusPanel")
 
     def stop(self):
