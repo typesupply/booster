@@ -23,9 +23,10 @@ methods, properties and attributes will be there for you.
 Thsi implements the basic notification behavior defined in
 BoosterNotificationMixin. This posts the following notifications:
 
-- fontDidOpen
-- fontWillClose
-- availableFontsChanged
+- bstr.fontDidOpen
+- bstr.fontWillClose
+- bstr.availableFontsChanged
+- bstr.defaultsChanged
 """
 
 import weakref
@@ -142,15 +143,19 @@ class BoosterController(BoosterNotificationMixin):
         """
         Convenience for mojo.extensions.setExtensionDefault.
         """
-        key = self._makeDefaultKey(key)
-        extensions.setExtensionDefault(key, value)
+        fullKey = self._makeDefaultKey(key)
+        old = extensions.getExtensionDefault(fullKey)
+        extensions.setExtensionDefault(fullKey, value)
+        self.postNotification("bstr.defaultsChanged", {key : (old, value)})
 
     def setDefaultColor(self, key, value):
         """
         Convenience for mojo.extensions.setExtensionDefaultColor.
         """
-        key = self._makeDefaultKey(key)
-        extensions.setExtensionDefaultColor(key, value)
+        fullKey = self._makeDefaultKey(key)
+        old = extensions.getExtensionDefaultColor(fullKey)
+        extensions.setExtensionDefaultColor(fullKey, value)
+        self.postNotification("bstr.defaultsChanged", {key : (old, value)})
 
     # ---
     # App
