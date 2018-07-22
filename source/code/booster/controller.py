@@ -44,8 +44,11 @@ from .requests import SharedRequestCenter
 
 class BoosterController(BoosterNotificationMixin):
 
-    fontWrapperClass = BoosterFont
+    # The identifier for the extension. Example: "com.typesuppl.Booster". Required.
     identifier = None
+
+    # The wrapper class for a particular extension. Optional.
+    fontWrapperClass = BoosterFont
 
     def __init__(self):
         """
