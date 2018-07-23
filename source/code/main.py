@@ -26,7 +26,7 @@ class BoosterStatusMonitorController(BoosterController):
     def stop(self):
         super(BoosterStatusMonitorController, self).stop()
         app = NSApp()
-        app.boosterMonitor = None
+        app.com_typesupply_boosterMonitor = None
         self.removeResponder("BoosterMonitor.ShowStatusPanel")
 
     def showStatusPanelResponder(self):
