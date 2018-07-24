@@ -5,9 +5,12 @@ This is a tool for monitoring the internals of Booster.
 from AppKit import NSApp, NSTimer
 import vanilla
 from defconAppKit.windows.baseWindow import BaseWindowController
+from mojo import events
 from booster.controller import BoosterController
 from booster.activity import SharedActivityPoller
 from booster.requests import SharedRequestCenter
+
+events.postEvent("Booster.HasLaunched")
 
 # --------------------
 # Controller/Responder
