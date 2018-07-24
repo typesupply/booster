@@ -106,6 +106,7 @@ class BoosterStatusMonitorPanelController(BaseWindowController):
 
     def windowCloseCallback(self, sender):
         super(BoosterStatusMonitorPanelController, self).windowCloseCallback(sender)
+        self.controller.statusPanelWillCloseCallback()
         self.controller.removeObserver(self, "bstr.availableFontsChanged")
         self.stopActivityTimer()
         self.controller.removeActivityObserver(self, "inactivityCallback")
