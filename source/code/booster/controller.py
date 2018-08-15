@@ -240,6 +240,8 @@ class BoosterController(BoosterNotificationMixin):
         return font
 
     def _rewrapFont(self, native):
+        if isinstance(native, self.fontWrapperClass):
+            return native
         if not hasattr(native, "naked"):
             naked = native
             native = RFont(naked)
@@ -247,6 +249,13 @@ class BoosterController(BoosterNotificationMixin):
             naked = native.naked()
         wrapped = self.fontWrapperClass(naked, showInterface=native.hasInterface(), document=native.document())
         return wrapped
+
+    def getWrappedFont(self, font):
+        """
+        Wrap the given font object in the class
+        defined as self.fontWrapperClass.
+        """
+        return self._rewrapFont(font)
 
     def getAllFonts(self):
         """
