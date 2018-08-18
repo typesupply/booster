@@ -30,3 +30,13 @@ if debug:
             clsName = orgName + repr(counter)
         return type(clsName, bases, dct)
 
+
+import time
+
+
+"""
+Some very basic debug support.
+"""
+
+def logMessage(message):
+    print(time.strftime("%H:%M:%S"), message)
