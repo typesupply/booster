@@ -357,7 +357,7 @@ class _FontObserver(object):
 # Idle Time Calculation
 # ---------------------
 
-idleTimePattern = re.compile("\"HIDIdleTime\"\s*=\s*(\d+)")
+idleTimePattern = re.compile(r"\"HIDIdleTime\"\s*=\s*(\d+)")
 nanoToSec = 10 ** 9
 
 def userIdleTime():
