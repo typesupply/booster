@@ -24,6 +24,7 @@ import weakref
 from collections import OrderedDict
 from Foundation import NSObject, NSTimer
 from AppKit import NSApp, NSNotificationCenter
+from objc import super
 from mojo.events import addObserver, removeObserver
 from mojo.roboFont import AllFonts
 from .debug import ClassNameIncrementer
